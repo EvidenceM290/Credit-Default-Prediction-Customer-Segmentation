@@ -74,7 +74,7 @@ Credit-Default-Prediction-Customer-Segmentation/
 - **Strongest correlations** found between **past repayment behaviors (PAY_X) and loan default**.
 - Weak correlation between **age and default**.
 
-![Customer Clusters](https://github.com/EvidenceM290/Credit-Default-Prediction-Customer-Segmentation/blob/main/images/Customer%20Clusters.png)
+![Customer Clusters](https://github.com/EvidenceM290/Credit-Default-Prediction-Customer-Segmentation/blob/main/images/Default%20Rates%20by%20Age.png)
 
 ---
 
