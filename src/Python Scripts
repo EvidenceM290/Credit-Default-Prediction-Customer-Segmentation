@@ -1,0 +1,156 @@
+import knime.scripting.io as knio
+import pandas as pd
+import matplotlib.pyplot as plt
+
+# Load input table and convert to pandas DataFrame
+df = knio.input_tables[0].to_pandas()
+
+# Rename 'default payment next month' column for clarity and convert it to categorical
+# Map 1 to 'Default' and 0 to 'Not Default' and ensure the data type is categorical
+df['default payment next month'] = df['default payment next month'].map({1: 'Default', 0: 'Not Default'}).astype('category')
+
+# Ensure all variables used in the scatterplot are numeric and convert if needed
+columns_to_plot = ['AGE', 'PAY_AMT1', 'PAY_AMT2', 'PAY_AMT3', 'PAY_AMT4', 'PAY_AMT5', 'PAY_AMT6']
+for col in columns_to_plot:
+    df[col] = pd.to_numeric(df[col], errors='coerce')
+
+# Drop rows where any of the columns_to_plot or 'default payment next month' have NaN values
+df = df.dropna(subset=columns_to_plot + ['default payment next month'])
+
+# Set up figure layout for scatterplots
+fig, axes = plt.subplots(nrows=2, ncols=3, figsize=(18, 12))
+plt.tight_layout(h_pad=4, pad=4)
+
+pay_amt_columns = ['PAY_AMT1', 'PAY_AMT2', 'PAY_AMT3', 'PAY_AMT4', 'PAY_AMT5', 'PAY_AMT6']
+axes = axes.flatten()
+
+# Generate scatterplots for each PAY_AMT variable versus AGE
+for i, pay_amt in enumerate(pay_amt_columns):
+    ax = axes[i]
+    
+    # Plot data points for "Not Default"
+    df_not_default = df[df['default payment next month'] == 'Not Default']
+    ax.scatter(df_not_default['AGE'], df_not_default[pay_amt], color='green', alpha=0.6, s=100, label='Not Default')
+
+    # Plot data points for "Default"
+    df_default = df[df['default payment next month'] == 'Default']
+    ax.scatter(df_default['AGE'], df_default[pay_amt], color='red', alpha=0.6, s=100, label='Default')
+
+    ax.set_title(f'AGE vs {pay_amt}')
+    ax.set_xlabel('AGE')
+    ax.set_ylabel(pay_amt)
+
+    # Add a legend to each subplot
+    ax.legend()
+
+# Set a main title for the figure
+fig.suptitle('Scatterplot Matrix: AGE vs PAY_AMT Variables by Default Status', y=1.02)
+
+# Assign the figure to the output_view variable
+knio.output_view = knio.view(fig)
+
+
+import knime.scripting.io as knio
+import pandas as pd
+import seaborn as sb
+import matplotlib.pyplot as plt
+
+# Load input table and convert to pandas DataFrame
+df = knio.input_tables[0].to_pandas()
+
+# Rename column 'default payment next month' to 'default' for easier visualization
+df.rename(columns={'default payment next month': 'default'}, inplace=True)
+
+# Filter data for default and non-default cases
+default_df = df[df['default'] == 1]
+non_default_df = df[df['default'] == 0]
+
+# Step 1 and Step 2: Setting up a grid layout for the visualizations
+fig, axes = plt.subplots(1, 2, figsize=(28, 12))  # One row, two columns, larger figure size for better visibility
+sb.set(style='white')
+
+# Step 1: Correlation Heatmap
+# Select columns of interest: 'default', 'AGE', and all 'PAY_AMT' variables
+columns_of_interest = ['default', 'AGE', 'PAY_AMT1', 'PAY_AMT2', 'PAY_AMT3', 'PAY_AMT4', 'PAY_AMT5', 'PAY_AMT6']
+df_subset = df[columns_of_interest]
+
+# Calculate the correlation matrix
+corr_matrix = df_subset.corr()
+
+# Create a heatmap of the correlation matrix
+sb.heatmap(
+    corr_matrix,
+    annot=True,
+    cmap='RdYlGn',  # Using bright colors with better distinction: Red-Yellow-Green
+    linewidths=0.5,
+    fmt=".2f",
+    cbar=True,
+    cbar_kws={"shrink": 0.8},
+    ax=axes[0]  # Plot on the first subplot
+)
+
+# Add labels and title to the heatmap
+axes[0].set_title('Correlation Heatmap: AGE, PAY_AMT Variables and Default', fontsize=20, fontweight='bold')
+axes[0].tick_params(axis='x', rotation=30, labelsize=14)
+axes[0].tick_params(axis='y', labelsize=14)
+
+# Step 2: Boxplots to compare distributions
+# Create a boxplot for AGE by DEFAULT, using 'default' as hue
+sb.boxplot(
+    x='default',
+    y='AGE',
+    data=df,
+    hue='default',
+    palette={0.0: 'green', 1.0: 'red'},  # Ensure keys match the data type of hue values (float)
+    ax=axes[1]  # Plot on the second subplot
+)
+axes[1].set_title('Boxplot of AGE by Default Status', fontsize=20)
+axes[1].set_xlabel('Default Payment Next Month (0 = No Default, 1 = Default)', fontsize=16)
+axes[1].set_ylabel('AGE', fontsize=16)
+axes[1].tick_params(axis='x', labelsize=14)
+axes[1].tick_params(axis='y', labelsize=14)
+
+# Adjust spacing between subplots for better visualization
+plt.tight_layout()
+
+# Assign the figure to the output_view variable
+knio.output_view = knio.view(fig)
+
+
+import knime.scripting.io as knio
+import pandas as pd
+import matplotlib.pyplot as plt
+from sklearn.cluster import KMeans
+
+# Convert the input ArrowTable to a Pandas DataFrame
+data = knio.input_tables[0].to_pandas()
+
+# Check if AGE column exists in the input data
+if 'AGE' in data.columns:
+    # Calculate WCSS for different values of k
+    wcss = []
+    for k in range(1, 11):
+        kmeans = KMeans(n_clusters=k, random_state=42)
+        kmeans.fit(data[['AGE']])
+        wcss.append(kmeans.inertia_)
+    
+    # Calculate the first derivative (difference between consecutive WCSS values)
+    wcss_diff = [wcss[i] - wcss[i + 1] for i in range(len(wcss) - 1)]
+
+    # Find the index of the largest drop in WCSS, which represents the "elbow" point
+    optimal_k = wcss_diff.index(max(wcss_diff)) + 2  # Add 2 because indexing starts at 0, and we need the next value after the drop
+
+    # Plot the elbow method
+    plt.figure(figsize=(12, 8))
+    plt.plot(range(1, 11), wcss, marker='o', linestyle='-')
+    plt.axvline(x=optimal_k, color='red', linestyle='--', label=f'Optimal k = {optimal_k}')
+    plt.title('Elbow Method for Optimal k')
+    plt.xlabel('Number of Clusters (k)')
+    plt.ylabel('WCSS')
+    plt.legend()
+
+    # Assign the plot to the output_view variable to display in KNIME
+    knio.output_view = knio.view(plt.gcf())
+
+# No need to output the table if you only want the plot
+
