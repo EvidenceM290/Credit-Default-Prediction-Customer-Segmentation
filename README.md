@@ -139,8 +139,8 @@ This project showcases the power of **kNN classification and k-means clustering*
 ---
 
 ## 📩 **Connect With Me**
-📧 **Email**: [your-email@example.com](mailto:your-email@example.com)  
-🔗 **LinkedIn**: [Your LinkedIn Profile](https://linkedin.com/in/your-profile)  
+📧 **Email:** emadhume@smu.edu  
+🔗 **LinkedIn:** [LinkedIn](https://www.linkedin.com/in/evidence-madhume-874540204/)  
 🌍 **GitHub**: [EvidenceM290](https://github.com/EvidenceM290)  
 
 ---
