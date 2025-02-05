@@ -62,7 +62,7 @@ Credit-Default-Prediction-Customer-Segmentation/
 - **Younger customers** have a **higher probability of defaulting**.
 - Customers **below 30 years old** are **high-risk borrowers**.
 
-![Default Rates by Age](https://github.com/EvidenceM290/Credit-Default-Prediction-Customer-Segmentation/blob/main/images/Default%20Rates%20by%20Age.png)
+![Default Rates by Age](https://github.com/EvidenceM290/Credit-Default-Prediction-Customer-Segmentation/blob/main/images/Repayment%20Amount%20by%20Age.png)
 
 ### 📌 Default Rates by Education Level
 - Customers with **lower education levels** (high school or below) **default more frequently**.
@@ -115,9 +115,7 @@ The **KNIME workflow** processes data, applies **kNN classification**, and segme
 ### 📌 Performance Comparison:
 - **Segmented models outperform the non-segmented model**.
 - **Cluster 0 is more predictable**, ideal for **customized credit policies**.
-
-![Repayment Amount by Age](https://github.com/EvidenceM290/Credit-Default-Prediction-Customer-Segmentation/blob/main/images/Repayment%20Amount%20by%20Age.png)
-
+  
 ---
 
 ## 🔥 **Key Takeaways**
